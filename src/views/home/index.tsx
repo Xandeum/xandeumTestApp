@@ -13,7 +13,7 @@ import dynamic from 'next/dynamic';
 export const HomeView: FC = ({ }) => {
 
   const wallet = useWallet();
-  const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
+  const connection = new Connection('http://8.52.151.4:8899', 'confirmed');
   // const { connection } = useConnection();
 
   const [isBigBangProcessing, setIsBigBangProcessing] = useState<boolean>(false);
