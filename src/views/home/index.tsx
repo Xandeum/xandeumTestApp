@@ -48,8 +48,7 @@ export const HomeView: FC = ({ }) => {
       fsIdBuffer.write(fsId, 'utf8');
 
       const data = Buffer.concat([
-        Buffer.from(Int8Array.from([0]).buffer),
-        fsIdBuffer,
+        Buffer.from(Int8Array.from([0]).buffer)
       ]);
 
 
