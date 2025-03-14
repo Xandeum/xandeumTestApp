@@ -1,50 +1,26 @@
 'use client';
 import React, { FC, useEffect, useRef, useState } from 'react';
 
-import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import xandeumLogo from "../../assets/XandeumLogoStandard.png"
-
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { LinearProgress } from '@mui/material';
-import AutorenewIcon from '@mui/icons-material/Autorenew';
-import confetti from 'canvas-confetti';
+import { useWallet } from '@solana/wallet-adapter-react';
 
 import Loader from 'components/Loader';
-import { CURRENT_ERA, MAX_PNODES, MAX_PNODES_PER_WALLET, PNODE_DISCOUNT_PRICE, PNODE_PRICE, PROGRAM, TREASURY, XANDMint } from 'CONSTS';
+import { PROGRAM } from 'CONSTS';
 import { notify } from 'utils/notifications';
 import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
-import { createAssociatedTokenAccountInstruction, getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import dynamic from 'next/dynamic';
-import { markCodeUsed, verifyCode } from 'services/discountCodeService';
-import { updatePurchases } from 'services/purchaseService';
-import { BN } from '@project-serum/anchor';
-import { getGlobalAccountData, getPnodeOwnerAccountData } from 'helpers/pNodeHelpers';
-import Image from 'next/image';
 
-const WalletMultiButtonDynamic = dynamic(
-  async () => (await import('@solana/wallet-adapter-react-ui')).WalletMultiButton,
-  { ssr: false }
-);
+import dynamic from 'next/dynamic';
 
 export const HomeView: FC = ({ }) => {
 
   const wallet = useWallet();
   const connection = new Connection('https://api.devnet.solana.com', 'confirmed');
   // const { connection } = useConnection();
-  const [dataReadError, setDataReadError] = useState<boolean>(false);
+
   const [isBigBangProcessing, setIsBigBangProcessing] = useState<boolean>(false);
   const [isArmageddonProcessing, setIsArmageddonProcessing] = useState<boolean>(false);
-  const [showPopupPurchase, setShowPopupPurchase] = useState<boolean>(false);
+
   const [txId, setTxId] = useState<string>('');
-  const timerRef = useRef(null); // Ref to store the timer ID
 
-  //read global account data
-  useEffect(() => {
-
-
-  }, [wallet])
 
   //function related to bigBang
   const onBigBang = async () => {
@@ -53,6 +29,76 @@ export const HomeView: FC = ({ }) => {
 
       if (!wallet?.connected || !wallet?.publicKey) {
         notify({ type: 'error', message: 'Error!', description: `Please connect your wallet first` });
+        setIsBigBangProcessing(false);
+        return;
+      }
+
+      const keys = [
+        {
+          pubkey: wallet.publicKey,
+          isSigner: true,
+          isWritable: true,
+        }
+
+      ];
+
+      const fsIdBuffer = Buffer.alloc(8);
+      // Write the fsId string into the buffer using UTF-8 encoding
+      const fsId = 'bigBang';
+      fsIdBuffer.write(fsId, 'utf8');
+
+      const data = Buffer.concat([
+        Buffer.from(Int8Array.from([0]).buffer),
+        fsIdBuffer,
+      ]);
+
+
+      const txIx = new TransactionInstruction({
+        keys: keys,
+        programId: PROGRAM,
+        data: data,
+      });
+
+      const transaction = new Transaction().add(txIx);
+
+      const {
+        context: { slot: minContextSlot },
+        value: { blockhash, lastValidBlockHeight }
+      } = await connection.getLatestBlockhashAndContext('confirmed');
+
+      // transaction.recentBlockhash = blockhash;
+      // transaction.feePayer = wallet.publicKey;
+      // wallet.signTransaction(transaction);
+
+      // const simulate = await connection.simulateTransaction(transaction);
+      // console.log("simulate >>> ", simulate);
+      // return;
+
+      const tx = await wallet?.sendTransaction(transaction, connection, {
+        minContextSlot,
+        skipPreflight: true,
+        preflightCommitment: 'processed'
+      });
+
+      setTxId(tx);
+
+      //wait for 3 seconds
+      await new Promise((resolve) => setTimeout(resolve
+        , 3000));
+
+      const confirmTx = await connection?.getSignatureStatuses([tx], { searchTransactionHistory: true });
+
+      // Check if the transaction has a status
+      const status = confirmTx?.value[0];
+      if (!status) {
+        notify({ type: 'error', message: 'Error!', description: 'Transaction status not found!' });
+        setIsBigBangProcessing(false);
+        return;
+      }
+
+      // Check if the transaction failed
+      if (status?.err) {
+        notify({ type: 'error', message: 'Transaction failed!', description: 'Custom program error', txid: tx });
         setIsBigBangProcessing(false);
         return;
       }
@@ -68,18 +114,88 @@ export const HomeView: FC = ({ }) => {
   //function related to armageddon
   const onArmageddon = async () => {
     try {
-      setIsBigBangProcessing(true);
+      setIsArmageddonProcessing(true);
 
       if (!wallet?.connected || !wallet?.publicKey) {
         notify({ type: 'error', message: 'Error!', description: `Please connect your wallet first` });
-        setIsBigBangProcessing(false);
+        setIsArmageddonProcessing(false);
+        return;
+      }
+
+      const keys = [
+        {
+          pubkey: wallet.publicKey,
+          isSigner: true,
+          isWritable: true,
+        }
+
+      ];
+
+      const fsIdBuffer = Buffer.alloc(8);
+      // Write the fsId string into the buffer using UTF-8 encoding
+      const fsId = 'bigBang';
+      fsIdBuffer.write(fsId, 'utf8');
+
+      const data = Buffer.concat([
+        Buffer.from(Int8Array.from([1]).buffer), // 1 for armageddon
+        fsIdBuffer,
+      ]);
+
+
+      const txIx = new TransactionInstruction({
+        keys: keys,
+        programId: PROGRAM,
+        data: data,
+      });
+
+      const transaction = new Transaction().add(txIx);
+
+      const {
+        context: { slot: minContextSlot },
+        value: { blockhash, lastValidBlockHeight }
+      } = await connection.getLatestBlockhashAndContext('confirmed');
+
+      // transaction.recentBlockhash = blockhash;
+      // transaction.feePayer = wallet.publicKey;
+      // wallet.signTransaction(transaction);
+
+      // const simulate = await connection.simulateTransaction(transaction);
+      // console.log("simulate >>> ", simulate);
+      // return;
+
+      const tx = await wallet?.sendTransaction(transaction, connection, {
+        minContextSlot,
+        skipPreflight: true,
+        preflightCommitment: 'processed'
+      });
+
+      setTxId(tx);
+
+      //wait for 3 seconds
+      await new Promise((resolve) => setTimeout(resolve
+        , 3000));
+
+      const confirmTx = await connection?.getSignatureStatuses([tx], { searchTransactionHistory: true });
+
+      // Check if the transaction has a status
+      const status = confirmTx?.value[0];
+      if (!status) {
+        notify({ type: 'error', message: 'Error!', description: 'Transaction status not found!' });
+        setIsArmageddonProcessing(false);
+        return;
+      }
+
+      // Check if the transaction failed
+      if (status?.err) {
+        notify({ type: 'error', message: 'Transaction failed!', description: 'Custom program error', txid: tx });
+        setIsArmageddonProcessing(false);
         return;
       }
 
 
     } catch (error) {
       console.log("error while armageddon >>>", error);
-      setIsBigBangProcessing(false);
+      setIsArmageddonProcessing(false);
       return;
     }
   }
