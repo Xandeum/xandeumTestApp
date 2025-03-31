@@ -42,10 +42,10 @@ export const HomeView: FC = ({ }) => {
 
       ];
 
-      const fsIdBuffer = Buffer.alloc(8);
-      // Write the fsId string into the buffer using UTF-8 encoding
-      const fsId = 'bigBang';
-      fsIdBuffer.write(fsId, 'utf8');
+      // const fsIdBuffer = Buffer.alloc(8);
+      // // Write the fsId string into the buffer using UTF-8 encoding
+      // const fsId = 'bigBang';
+      // fsIdBuffer.write(fsId, 'utf8');
 
       const data = Buffer.concat([
         Buffer.from(Int8Array.from([0]).buffer)
