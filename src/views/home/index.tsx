@@ -9,6 +9,7 @@ import { notify } from 'utils/notifications';
 import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
 
 import dynamic from 'next/dynamic';
+import { getTransactionStatus } from 'components/GetTransactionStatus';
 
 export const HomeView: FC = ({ }) => {
 
@@ -42,15 +43,9 @@ export const HomeView: FC = ({ }) => {
 
       ];
 
-      // const fsIdBuffer = Buffer.alloc(8);
-      // // Write the fsId string into the buffer using UTF-8 encoding
-      // const fsId = 'bigBang';
-      // fsIdBuffer.write(fsId, 'utf8');
-
       const data = Buffer.concat([
         Buffer.from(Int8Array.from([0]).buffer)
       ]);
-
 
       const txIx = new TransactionInstruction({
         keys: keys,
@@ -85,22 +80,19 @@ export const HomeView: FC = ({ }) => {
       await new Promise((resolve) => setTimeout(resolve
         , 3000));
 
-      const confirmTx = await connection?.getSignatureStatuses([tx], { searchTransactionHistory: true });
+      const confirmTx = await getTransactionStatus(tx);
 
       // Check if the transaction has a status
-      const status = confirmTx?.value[0];
+      const status = confirmTx?.ok;
       if (!status) {
         notify({ type: 'error', message: 'Error!', description: 'Transaction status not found!' });
         setIsBigBangProcessing(false);
         return;
       }
 
-      // Check if the transaction failed
-      if (status?.err) {
-        notify({ type: 'error', message: 'Transaction failed!', description: 'Custom program error', txid: tx });
-        setIsBigBangProcessing(false);
-        return;
-      }
+      notify({ type: 'success', message: 'Success!', description: 'Transaction successful!' });
+      setIsBigBangProcessing(false);
+      return;
 
 
     } catch (error) {
