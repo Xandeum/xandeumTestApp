@@ -6,14 +6,18 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import Loader from 'components/Loader';
 import { PROGRAM } from 'CONSTS';
 import { notify } from 'utils/notifications';
-import { Connection, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
+import { Connection, Keypair, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
+
+import { walletKeypair } from 'helpers/keypair';
 
 import dynamic from 'next/dynamic';
 import { getTransactionStatus } from 'components/GetTransactionStatus';
 
 export const HomeView: FC = ({ }) => {
 
-  const wallet = useWallet();
+  // const wallet = useWallet();
+  const wallet = Keypair.fromSecretKey(Uint8Array.from(walletKeypair.privateKey));
+
   const connection = new Connection('http://8.52.151.4:8899', 'confirmed');
   // const { connection } = useConnection();
 
@@ -23,16 +27,20 @@ export const HomeView: FC = ({ }) => {
   const [txId, setTxId] = useState<string>('');
 
 
-  //function related to bigBang
+  //function related to bigBang(insert)
   const onBigBang = async () => {
     try {
       setIsBigBangProcessing(true);
 
-      if (!wallet?.connected || !wallet?.publicKey) {
-        notify({ type: 'error', message: 'Error!', description: `Please connect your wallet first` });
-        setIsBigBangProcessing(false);
-        return;
-      }
+
+
+      // if (!wallet?.connected || !wallet?.publicKey) {
+      //   notify({ type: 'error', message: 'Error!', description: `Please connect your wallet first` });
+      //   setIsBigBangProcessing(false);
+      //   return;
+      // }
+
+
 
       const keys = [
         {
@@ -68,31 +76,83 @@ export const HomeView: FC = ({ }) => {
       // console.log("simulate >>> ", simulate);
       // return;
 
-      const tx = await wallet?.sendTransaction(transaction, connection, {
-        minContextSlot,
-        skipPreflight: true,
-        preflightCommitment: 'processed'
-      });
+      // const tx = await wallet?.sendTransaction(transaction, connection, {
+      //   minContextSlot,
+      //   skipPreflight: true,
+      //   preflightCommitment: 'processed'
+      // });
+
+
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = wallet.publicKey;
+      transaction.sign(wallet);
+
+      const tx = await connection.sendRawTransaction(transaction.serialize());
 
       setTxId(tx);
 
-      //wait for 3 seconds
-      await new Promise((resolve) => setTimeout(resolve
-        , 3000));
 
-      const confirmTx = await getTransactionStatus(tx);
 
-      // Check if the transaction has a status
-      const status = confirmTx?.ok;
-      if (!status) {
-        notify({ type: 'error', message: 'Error!', description: 'Transaction status not found!' });
+      console.log("tx id >>> ", tx)
+      const ws = new WebSocket('ws://8.52.151.4:8900');
+
+      // check websocket connection
+      ws.addEventListener('open', () => {
+        console.log('WebSocket connection opened');
+      });
+
+      ws.addEventListener('open', () => {
+        console.log('WebSocket connection opened');
+
+        const subscriptionMessage = {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "xandeumResultSubscribe",
+          "params": [tx, { "commitment": "finalized" }]
+        };
+
+        ws.send(JSON.stringify(subscriptionMessage));
+      });
+
+      ws.addEventListener('message', (event) => {
+        console.log('Received:', JSON.parse(event.data));
         setIsBigBangProcessing(false);
-        return;
-      }
 
-      notify({ type: 'success', message: 'Success!', description: 'Transaction successful!' });
-      setIsBigBangProcessing(false);
-      return;
+      });
+
+      ws.addEventListener('error', (error) => {
+        console.error('WebSocket error:', error);
+        setIsBigBangProcessing(false);
+
+      });
+
+      ws.addEventListener('close', () => {
+        console.log('WebSocket connection closed');
+        setIsBigBangProcessing(false);
+
+      });
+
+
+
+
+
+      // //wait for 3 seconds
+      // await new Promise((resolve) => setTimeout(resolve
+      //   , 3000));
+
+      // const confirmTx = await getTransactionStatus(tx);
+
+      // // Check if the transaction has a status
+      // const status = confirmTx?.ok;
+      // if (!status) {
+      //   notify({ type: 'error', message: 'Error!', description: 'Transaction status not found!' });
+      //   setIsBigBangProcessing(false);
+      //   return;
+      // }
+
+      // notify({ type: 'success', message: 'Success!', description: 'Transaction successful!' });
+      // setIsBigBangProcessing(false);
+      // return;
 
 
     } catch (error) {
@@ -107,7 +167,7 @@ export const HomeView: FC = ({ }) => {
     try {
       setIsArmageddonProcessing(true);
 
-      if (!wallet?.connected || !wallet?.publicKey) {
+      if (!wallet?.publicKey) {
         notify({ type: 'error', message: 'Error!', description: `Please connect your wallet first` });
         setIsArmageddonProcessing(false);
         return;
@@ -205,7 +265,7 @@ export const HomeView: FC = ({ }) => {
 
         <button type="button" className="btn bg-[#D98C18] hover:bg-[#fda31b] border-xnd border-none px-6 text-lg group flex p-2 gap-2 items-center justify-center self-center border-xnd font-normal focus:outline-none text-white disabled:bg-opacity-50 disabled:opacity-50 w-fit min-w-[14rem]"
           onClick={onBigBang}
-          disabled={isBigBangProcessing || !wallet?.connected || !wallet?.publicKey}
+          disabled={isBigBangProcessing || !wallet?.publicKey}
         >
           {
             isBigBangProcessing ?
@@ -222,7 +282,7 @@ export const HomeView: FC = ({ }) => {
 
         <button type="button" className="btn bg-[#D98C18] hover:bg-[#fda31b] border-xnd border-none px-6 text-lg group flex p-2 gap-2 items-center justify-center self-center border-xnd font-normal focus:outline-none text-white disabled:bg-opacity-50 disabled:opacity-50 w-fit min-w-[14rem]"
           onClick={onArmageddon}
-          disabled={isArmageddonProcessing || !wallet?.connected || !wallet?.publicKey}
+          disabled={isArmageddonProcessing || !wallet?.publicKey}
         >
           {
             isArmageddonProcessing ?

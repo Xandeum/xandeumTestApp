@@ -23,11 +23,8 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
     let endpoint = useMemo(() => clusterApiUrl(network), [network]);
 
     if (network === WalletAdapterNetwork.Devnet) {
-        // endpoint = "https://devnet.genesysgo.net/";
-        // endpoint = "https://solana-devnet.g.alchemy.com/v2/-YivZ25qhF6gAEstW8OitDHzd27sOIOU";
-        // endpoint = "https://api.devnet.solana.com";
-        // endpoint = "https://morning-ultra-silence.solana-devnet.discover.quiknode.pro/509ee60896bf477916c101beca13fec25d2be8d5/";
-        endpoint = "https://devnet.helius-rpc.com/?api-key=2aca1e9b-9f51-44a0-938b-89dc6c23e9b4";
+        // endpoint = "https://devnet.helius-rpc.com/?api-key=2aca1e9b-9f51-44a0-938b-89dc6c23e9b4";
+        endpoint = "http://8.52.151.4:8899";
     }
     if (network === WalletAdapterNetwork.Mainnet) {
         // endpoint = "https://red-yolo-mountain.solana-mainnet.quiknode.pro/174b836a161a7cafc760c335f3930638cf9f19ec/";
