@@ -140,7 +140,7 @@ export const HomeView: FC = ({ }) => {
 
       const data = Buffer.concat([
         Buffer.from(Int8Array.from([1]).buffer), // 1 for armageddon
-        Buffer.from(Uint8Array.of(...new BN("1498531940105142728").toArray("le", 8))),
+        Buffer.from(Uint8Array.of(...new BN("1614381932209850616").toArray("le", 8))),
       ]);
 
       const txIx = new TransactionInstruction({
@@ -175,7 +175,8 @@ export const HomeView: FC = ({ }) => {
         const subscriptionMessage = {
           "jsonrpc": "2.0",
           "id": 1,
-          "method": "xandeumResultUnscribe",
+          // "method": "xandeumResultUnscribe",
+          "method": "xandeumResultSubscribe",
           "params": [tx, { "commitment": "finalized" }]
         };
 
@@ -187,6 +188,8 @@ export const HomeView: FC = ({ }) => {
         const d = JSON.parse(
           String(event.data).replace(/:\s*(\d{16,})/g, ': "$1"')
         );
+
+        console.log("after armageddon : ", d);
 
         if (d.params && d.params.result && d.params.result.value) {
           console.log('FSID after Aramageddon :', d.params.result.value);
