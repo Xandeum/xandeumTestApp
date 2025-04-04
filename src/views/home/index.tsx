@@ -21,7 +21,6 @@ export const HomeView: FC = ({ }) => {
   const [txId, setTxId] = useState<string>('');
   const [fsId, setFsId] = useState<string>('');
 
-
   //function related to bigBang(insert)
   const onBigBang = async () => {
     try {
@@ -219,7 +218,7 @@ export const HomeView: FC = ({ }) => {
 
   return (
     <div className="container flex mx-auto flex-col items-center w-full max-w-4xl p-4 mb-10">
-      <h2 className="text-3xl font-medium text-white md:leading-tight  my-5">Test App</h2>
+      <h2 className="text-3xl font-medium text-white md:leading-tight  my-5">Xandeum Test App</h2>
       <div className='flex flex-col gap-8 bg-tiles border-xnd w-full text-white p-5  mt-8 relative md:mb-0 mb-28 text-base'>
         <button type="button" className="btn bg-[#D98C18] hover:bg-[#fda31b] border-xnd border-none px-6 text-lg group flex p-2 gap-2 items-center justify-center self-center border-xnd font-normal focus:outline-none text-white disabled:bg-opacity-50 disabled:opacity-50 w-fit min-w-[14rem]"
           onClick={onBigBang}
