@@ -84,10 +84,6 @@ export const HomeView: FC = ({ }) => {
       // check websocket connection
       ws.addEventListener('open', () => {
         console.log('WebSocket connection opened');
-      });
-
-      ws.addEventListener('open', () => {
-        console.log('WebSocket connection opened');
 
         const subscriptionMessage = {
           "jsonrpc": "2.0",
@@ -186,10 +182,6 @@ export const HomeView: FC = ({ }) => {
       const ws = new WebSocket('ws://8.52.151.4:8900');
 
       // check websocket connection
-      ws.addEventListener('open', () => {
-        console.log('WebSocket connection opened');
-      });
-
       ws.addEventListener('open', () => {
         console.log('WebSocket connection opened');
 
