@@ -7,10 +7,10 @@ const Home: NextPage = (props) => {
   return (
     <div className="w-full md:w-3/4">
       <Head>
-        <title>Test App</title>
+        <title>Xandeum Test App</title>
         <meta
           name="description"
-          content="Test App"
+          content="Xandeum Test App"
         />
       </Head>
       <HomeView />

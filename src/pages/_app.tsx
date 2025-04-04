@@ -14,7 +14,7 @@ const App: FC<AppProps> = ({ Component, pageProps }) => {
   return (
     <>
       <Head>
-        <title>Test App</title>
+        <title>Xandeum Test App</title>
       </Head>
 
       <ContextProvider>
