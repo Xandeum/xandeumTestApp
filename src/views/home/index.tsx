@@ -9,9 +9,6 @@ import { notify } from 'utils/notifications';
 import { ComputeBudgetProgram, Connection, Keypair, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
 
 import { walletKeypair } from 'helpers/keypair';
-
-import dynamic from 'next/dynamic';
-import { getTransactionStatus } from 'components/GetTransactionStatus';
 import { BN } from '@project-serum/anchor';
 
 export const HomeView: FC = ({ }) => {
@@ -129,29 +126,6 @@ export const HomeView: FC = ({ }) => {
         setIsBigBangProcessing(false);
 
       });
-
-
-
-
-
-      // //wait for 3 seconds
-      // await new Promise((resolve) => setTimeout(resolve
-      //   , 3000));
-
-      // const confirmTx = await getTransactionStatus(tx);
-
-      // // Check if the transaction has a status
-      // const status = confirmTx?.ok;
-      // if (!status) {
-      //   notify({ type: 'error', message: 'Error!', description: 'Transaction status not found!' });
-      //   setIsBigBangProcessing(false);
-      //   return;
-      // }
-
-      // notify({ type: 'success', message: 'Success!', description: 'Transaction successful!' });
-      // setIsBigBangProcessing(false);
-      // return;
-
 
     } catch (error) {
       console.log("error while bigbang >>>", error);
