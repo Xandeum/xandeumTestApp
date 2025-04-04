@@ -1,23 +1,19 @@
 'use client';
-import React, { FC, useEffect, useRef, useState } from 'react';
-
-import { useWallet } from '@solana/wallet-adapter-react';
+import React, { FC, useState } from 'react';
 
 import Loader from 'components/Loader';
-import { PROGRAM } from 'CONSTS';
+import { PROGRAM, XANDEUM_WS } from 'CONSTS';
 import { notify } from 'utils/notifications';
-import { ComputeBudgetProgram, Connection, Keypair, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
+import { ComputeBudgetProgram, Connection, Keypair, Transaction, TransactionInstruction } from '@solana/web3.js';
 
 import { walletKeypair } from 'helpers/keypair';
 import { BN } from '@project-serum/anchor';
 
 export const HomeView: FC = ({ }) => {
 
-  // const wallet = useWallet();
   const wallet = Keypair.fromSecretKey(Uint8Array.from(walletKeypair.privateKey));
 
   const connection = new Connection('http://8.52.151.4:8899', 'confirmed');
-  // const { connection } = useConnection();
 
   const [isBigBangProcessing, setIsBigBangProcessing] = useState<boolean>(false);
   const [isArmageddonProcessing, setIsArmageddonProcessing] = useState<boolean>(false);
@@ -31,15 +27,11 @@ export const HomeView: FC = ({ }) => {
     try {
       setIsBigBangProcessing(true);
 
-
-
-      // if (!wallet?.connected || !wallet?.publicKey) {
-      //   notify({ type: 'error', message: 'Error!', description: `Please connect your wallet first` });
-      //   setIsBigBangProcessing(false);
-      //   return;
-      // }
-
-
+      if (!wallet?.publicKey) {
+        notify({ type: 'error', message: 'Error!', description: `Please connect your wallet first` });
+        setIsBigBangProcessing(false);
+        return;
+      }
 
       const keys = [
         {
@@ -76,10 +68,8 @@ export const HomeView: FC = ({ }) => {
 
       setTxId(tx);
 
-
-
-      console.log("tx id >>> ", tx)
-      const ws = new WebSocket('ws://8.52.151.4:8900');
+      console.log("tx id : ", tx)
+      const ws = new WebSocket(XANDEUM_WS);
 
       // check websocket connection
       ws.addEventListener('open', () => {
@@ -96,15 +86,14 @@ export const HomeView: FC = ({ }) => {
       });
 
       ws.addEventListener('message', (event) => {
-        // console.log('Received in Armageddon:', JSON.parse(event.data));
         const d = JSON.parse(
           String(event.data).replace(/:\s*(\d{16,})/g, ': "$1"')
         );
 
         if (d.params && d.params.result && d.params.result.value) {
-          console.log('Value:', d.params.result.value);
+          console.log('FSID after BigBang :', d.params.result.value);
         } else {
-          // console.log('Value field not found');
+          console.log('Value field not found');
         }
 
         setIsBigBangProcessing(false);
@@ -124,7 +113,7 @@ export const HomeView: FC = ({ }) => {
       });
 
     } catch (error) {
-      console.log("error while bigbang >>>", error);
+      console.log("error while bigbang : ", error);
       setIsBigBangProcessing(false);
       return;
     }
@@ -155,7 +144,6 @@ export const HomeView: FC = ({ }) => {
         Buffer.from(Uint8Array.of(...new BN("1498531940105142728").toArray("le", 8))),
       ]);
 
-
       const txIx = new TransactionInstruction({
         keys: keys,
         programId: PROGRAM,
@@ -178,8 +166,8 @@ export const HomeView: FC = ({ }) => {
 
       setTxId(tx);
 
-      console.log("tx id >>> ", tx)
-      const ws = new WebSocket('ws://8.52.151.4:8900');
+      console.log("tx id : ", tx)
+      const ws = new WebSocket(XANDEUM_WS);
 
       // check websocket connection
       ws.addEventListener('open', () => {
@@ -196,15 +184,15 @@ export const HomeView: FC = ({ }) => {
       });
 
       ws.addEventListener('message', (event) => {
-        // console.log('Received in Armageddon:', JSON.parse(event.data));
+
         const d = JSON.parse(
           String(event.data).replace(/:\s*(\d{16,})/g, ': "$1"')
         );
 
         if (d.params && d.params.result && d.params.result.value) {
-          console.log('Value:', d.params.result.value);
+          console.log('FSID after Aramageddon :', d.params.result.value);
         } else {
-          // console.log('Value field not found');
+          console.log('Value field not found');
         }
         setIsArmageddonProcessing(false);
 
@@ -222,9 +210,8 @@ export const HomeView: FC = ({ }) => {
 
       });
 
-
     } catch (error) {
-      console.log("error while armageddon >>>", error);
+      console.log("error while armageddon : ", error);
       setIsArmageddonProcessing(false);
       return;
     }
@@ -232,16 +219,8 @@ export const HomeView: FC = ({ }) => {
 
   return (
     <div className="container flex mx-auto flex-col items-center w-full max-w-4xl p-4 mb-10">
-
-
       <h2 className="text-3xl font-medium text-white md:leading-tight  my-5">Test App</h2>
-
-
       <div className='flex flex-col gap-8 bg-tiles border-xnd w-full text-white p-5  mt-8 relative md:mb-0 mb-28 text-base'>
-        {/* <div className="absolute -inset-2 -z-10 bg-gradient-to-r from-[#fda31b] via-[#622657] to-[#198476] border-xnd blur  "></div> */}
-
-
-
         <button type="button" className="btn bg-[#D98C18] hover:bg-[#fda31b] border-xnd border-none px-6 text-lg group flex p-2 gap-2 items-center justify-center self-center border-xnd font-normal focus:outline-none text-white disabled:bg-opacity-50 disabled:opacity-50 w-fit min-w-[14rem]"
           onClick={onBigBang}
           disabled={isBigBangProcessing || !wallet?.publicKey}
@@ -275,9 +254,7 @@ export const HomeView: FC = ({ }) => {
             armageddon
           </div>
         </button>
-
       </div>
-
     </div>
   );
 };
