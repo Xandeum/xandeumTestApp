@@ -103,16 +103,15 @@ export const HomeView: FC = ({ }) => {
       });
 
       ws.addEventListener('message', (event) => {
-        console.log('Received in BigBang:', JSON.parse(event.data));
-
+        // console.log('Received in Armageddon:', JSON.parse(event.data));
         const d = JSON.parse(
-          String(data).replace(/:\s*(\d{16,})/g, ': "$1"')
+          String(event.data).replace(/:\s*(\d{16,})/g, ': "$1"')
         );
 
         if (d.params && d.params.result && d.params.result.value) {
           console.log('Value:', d.params.result.value);
         } else {
-          console.log('Value field not found');
+          // console.log('Value field not found');
         }
 
         setIsBigBangProcessing(false);
@@ -183,7 +182,7 @@ export const HomeView: FC = ({ }) => {
 
       const data = Buffer.concat([
         Buffer.from(Int8Array.from([1]).buffer), // 1 for armageddon
-        Buffer.from(Uint8Array.of(...new BN("17259782960996828624").toArray("le", 8))),
+        Buffer.from(Uint8Array.of(...new BN("1498531940105142728").toArray("le", 8))),
       ]);
 
 
@@ -231,7 +230,16 @@ export const HomeView: FC = ({ }) => {
       });
 
       ws.addEventListener('message', (event) => {
-        console.log('Received in Armageddon:', JSON.parse(event.data));
+        // console.log('Received in Armageddon:', JSON.parse(event.data));
+        const d = JSON.parse(
+          String(event.data).replace(/:\s*(\d{16,})/g, ': "$1"')
+        );
+
+        if (d.params && d.params.result && d.params.result.value) {
+          console.log('Value:', d.params.result.value);
+        } else {
+          // console.log('Value field not found');
+        }
         setIsArmageddonProcessing(false);
 
       });
