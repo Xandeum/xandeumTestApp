@@ -6,12 +6,13 @@ import { useWallet } from '@solana/wallet-adapter-react';
 import Loader from 'components/Loader';
 import { PROGRAM } from 'CONSTS';
 import { notify } from 'utils/notifications';
-import { Connection, Keypair, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
+import { ComputeBudgetProgram, Connection, Keypair, PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js';
 
 import { walletKeypair } from 'helpers/keypair';
 
 import dynamic from 'next/dynamic';
 import { getTransactionStatus } from 'components/GetTransactionStatus';
+import { BN } from '@project-serum/anchor';
 
 export const HomeView: FC = ({ }) => {
 
@@ -25,6 +26,7 @@ export const HomeView: FC = ({ }) => {
   const [isArmageddonProcessing, setIsArmageddonProcessing] = useState<boolean>(false);
 
   const [txId, setTxId] = useState<string>('');
+  const [fsId, setFsId] = useState<string>('');
 
 
   //function related to bigBang(insert)
@@ -68,21 +70,7 @@ export const HomeView: FC = ({ }) => {
         value: { blockhash, lastValidBlockHeight }
       } = await connection.getLatestBlockhashAndContext('confirmed');
 
-      // transaction.recentBlockhash = blockhash;
-      // transaction.feePayer = wallet.publicKey;
-      // wallet.signTransaction(transaction);
-
-      // const simulate = await connection.simulateTransaction(transaction);
-      // console.log("simulate >>> ", simulate);
-      // return;
-
-      // const tx = await wallet?.sendTransaction(transaction, connection, {
-      //   minContextSlot,
-      //   skipPreflight: true,
-      //   preflightCommitment: 'processed'
-      // });
-
-
+      transaction.add(ComputeBudgetProgram.setComputeUnitLimit({ units: 3000000 }));
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = wallet.publicKey;
       transaction.sign(wallet);
@@ -115,7 +103,18 @@ export const HomeView: FC = ({ }) => {
       });
 
       ws.addEventListener('message', (event) => {
-        console.log('Received:', JSON.parse(event.data));
+        console.log('Received in BigBang:', JSON.parse(event.data));
+
+        const d = JSON.parse(
+          String(data).replace(/:\s*(\d{16,})/g, ': "$1"')
+        );
+
+        if (d.params && d.params.result && d.params.result.value) {
+          console.log('Value:', d.params.result.value);
+        } else {
+          console.log('Value field not found');
+        }
+
         setIsBigBangProcessing(false);
 
       });
@@ -182,14 +181,9 @@ export const HomeView: FC = ({ }) => {
 
       ];
 
-      const fsIdBuffer = Buffer.alloc(8);
-      // Write the fsId string into the buffer using UTF-8 encoding
-      const fsId = 'bigBang';
-      fsIdBuffer.write(fsId, 'utf8');
-
       const data = Buffer.concat([
         Buffer.from(Int8Array.from([1]).buffer), // 1 for armageddon
-        fsIdBuffer,
+        Buffer.from(Uint8Array.of(...new BN("17259782960996828624").toArray("le", 8))),
       ]);
 
 
@@ -206,42 +200,53 @@ export const HomeView: FC = ({ }) => {
         value: { blockhash, lastValidBlockHeight }
       } = await connection.getLatestBlockhashAndContext('confirmed');
 
-      // transaction.recentBlockhash = blockhash;
-      // transaction.feePayer = wallet.publicKey;
-      // wallet.signTransaction(transaction);
+      transaction.add(ComputeBudgetProgram.setComputeUnitLimit({ units: 3000000 }));
+      transaction.recentBlockhash = blockhash;
+      transaction.feePayer = wallet.publicKey;
+      transaction.sign(wallet);
 
-      // const simulate = await connection.simulateTransaction(transaction);
-      // console.log("simulate >>> ", simulate);
-      // return;
-
-      const tx = await wallet?.sendTransaction(transaction, connection, {
-        minContextSlot,
-        skipPreflight: true,
-        preflightCommitment: 'processed'
-      });
+      const tx = await connection.sendRawTransaction(transaction.serialize());
 
       setTxId(tx);
 
-      //wait for 3 seconds
-      await new Promise((resolve) => setTimeout(resolve
-        , 3000));
+      console.log("tx id >>> ", tx)
+      const ws = new WebSocket('ws://8.52.151.4:8900');
 
-      const confirmTx = await connection?.getSignatureStatuses([tx], { searchTransactionHistory: true });
+      // check websocket connection
+      ws.addEventListener('open', () => {
+        console.log('WebSocket connection opened');
+      });
 
-      // Check if the transaction has a status
-      const status = confirmTx?.value[0];
-      if (!status) {
-        notify({ type: 'error', message: 'Error!', description: 'Transaction status not found!' });
+      ws.addEventListener('open', () => {
+        console.log('WebSocket connection opened');
+
+        const subscriptionMessage = {
+          "jsonrpc": "2.0",
+          "id": 1,
+          "method": "xandeumResultUnscribe",
+          "params": [tx, { "commitment": "finalized" }]
+        };
+
+        ws.send(JSON.stringify(subscriptionMessage));
+      });
+
+      ws.addEventListener('message', (event) => {
+        console.log('Received in Armageddon:', JSON.parse(event.data));
         setIsArmageddonProcessing(false);
-        return;
-      }
 
-      // Check if the transaction failed
-      if (status?.err) {
-        notify({ type: 'error', message: 'Transaction failed!', description: 'Custom program error', txid: tx });
+      });
+
+      ws.addEventListener('error', (error) => {
+        console.error('WebSocket error:', error);
         setIsArmageddonProcessing(false);
-        return;
-      }
+
+      });
+
+      ws.addEventListener('close', () => {
+        console.log('WebSocket connection closed');
+        setIsArmageddonProcessing(false);
+
+      });
 
 
     } catch (error) {
