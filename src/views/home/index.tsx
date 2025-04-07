@@ -4,16 +4,19 @@ import React, { FC, useState } from 'react';
 import Loader from 'components/Loader';
 import { PROGRAM, XANDEUM_WS } from 'CONSTS';
 import { notify } from 'utils/notifications';
-import { ComputeBudgetProgram, Connection, Keypair, Transaction, TransactionInstruction } from '@solana/web3.js';
+import { ComputeBudgetProgram, Connection, Keypair, LAMPORTS_PER_SOL, Transaction, TransactionInstruction } from '@solana/web3.js';
 
 import { walletKeypair } from 'helpers/keypair';
 import { BN } from '@project-serum/anchor';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 
 export const HomeView: FC = ({ }) => {
 
-  const wallet = Keypair.fromSecretKey(Uint8Array.from(walletKeypair.privateKey));
+  // const wallet = Keypair.fromSecretKey(Uint8Array.from(walletKeypair.privateKey));
+  const wallet = useWallet();
 
-  const connection = new Connection('http://8.52.151.4:8899', 'confirmed');
+  // const connection = new Connection('http://8.52.151.4:8899', 'confirmed');
+  const { connection } = useConnection();
 
   const [isBigBangProcessing, setIsBigBangProcessing] = useState<boolean>(false);
   const [isArmageddonProcessing, setIsArmageddonProcessing] = useState<boolean>(false);
@@ -25,6 +28,10 @@ export const HomeView: FC = ({ }) => {
   const onBigBang = async () => {
     try {
       setIsBigBangProcessing(true);
+
+      console.log("connection >>> ", connection.rpcEndpoint)
+      const balance = await connection.getBalance(wallet.publicKey);
+      console.log("balance : ", balance);
 
       if (!wallet?.publicKey) {
         notify({ type: 'error', message: 'Error!', description: `Please connect your wallet first` });
@@ -44,7 +51,6 @@ export const HomeView: FC = ({ }) => {
       const data = Buffer.concat([
         Buffer.from(Int8Array.from([0]).buffer)
       ]);
-
       const txIx = new TransactionInstruction({
         keys: keys,
         programId: PROGRAM,
@@ -58,14 +64,35 @@ export const HomeView: FC = ({ }) => {
         value: { blockhash, lastValidBlockHeight }
       } = await connection.getLatestBlockhashAndContext('confirmed');
 
-      transaction.add(ComputeBudgetProgram.setComputeUnitLimit({ units: 3000000 }));
+      // transaction.add(ComputeBudgetProgram.setComputeUnitLimit({ units: 3000000 }));
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = wallet.publicKey;
-      transaction.sign(wallet);
+      // transaction.sign(wallet.);
+      wallet.signTransaction(transaction);
 
-      const tx = await connection.sendRawTransaction(transaction.serialize());
+      // const tx = await connection.sendRawTransaction(transaction.serialize());
+
+      console.log("transaction has been created");
+
+      // const tx = await wallet.sendTransaction(transaction, connection, {
+      //   minContextSlot,
+      //   skipPreflight: true,
+      //   preflightCommitment: 'processed'
+      // });
+
+      // const tx = await connection.sendRawTransaction(transaction.serialize())
+
+      // transaction.recentBlockhash = blockhash;
+      // transaction.feePayer = wallet.publicKey;
+      // wallet.signTransaction(transaction);
+
+      const simulate = await connection.simulateTransaction(transaction);
+      console.log("simulate >>> ", simulate);
+      return;
 
       setTxId(tx);
+
+      console.log("transaction has been sent");
 
       console.log("tx id : ", tx)
       const ws = new WebSocket(XANDEUM_WS);
