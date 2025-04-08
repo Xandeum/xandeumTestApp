@@ -277,26 +277,24 @@ export const HomeView: FC = ({ }) => {
     <div className="container flex mx-auto flex-col items-center w-full max-w-4xl p-4 mb-10">
       <h2 className="text-3xl font-medium text-white md:leading-tight  my-5">Xandeum Test App - DevNet</h2>
 
-      <div className='flex flex-col gap-4 bg-tiles border-xnd w-full text-white p-10  mt-8 relative md:mb-0 mb-28 text-base'>
+      <div className='flex flex-col gap-4 bg-tiles border-xnd w-full text-white p-3  mt-8 relative md:mb-0 mb-28 text-base'>
         <div className="absolute -inset-2 -z-10 bg-gradient-to-r from-[#fda31b] via-[#622657] to-[#198476] border-xnd blur  "></div>
-        <p className="font-medium text-white md:leading-tight text-center  my-2">
+        <p className="font-medium text-white md:leading-tight text-justify  my-2">
           This is a demo of the Xandeum Freiburg release. It showcases that xandeum-agave, our modified validator client, can intercept Xandeum Transactions that are wrapped into normal Solana transaction, decode them, send them through secure, high-perfomance and redundant communication channels through intermediate infrastructure and process them on a system named Atlas.
         </p>
 
-        <p className="font-medium text-white md:leading-tight text-center  my-2">
+        <p className="font-medium text-white md:leading-tight text-justify  my-2">
           Missing the actual storage of data? Freiburg is all the technical foundation - and data will be chunked into pages and sent to and stored on pNodes in the upcoming Munich release.
         </p>
-        <p className="font-medium text-white md:leading-tight text-center  my-2">
-
+        <p className="font-medium text-white md:leading-tight text-justify  my-2">
           Now have fun playing God - run your own &apos;bigBang&apos;s to create a universe, a.k.a. file system, and destroy some universes via &apos;armageddon&apos;.
         </p>
 
-        <p className="font-medium text-white md:leading-tight text-center  my-2">
-
+        <p className="font-medium text-white md:leading-tight text-justify  my-2">
           It looks simple and effortless - but it encompasses all the hard work of digging deep into the Solana inner workings and modify them for our purposes, creating that solid foundation for what&apos;s to come.
         </p>
 
-        <p className="font-medium text-white md:leading-tight text-center  my-2">
+        <p className="font-medium text-white md:leading-tight text-justify  my-2">
           If it doesn’t look easy, you’re not working hard enough.
           <br />
           -- Fred Astaire
