@@ -11,10 +11,10 @@ html,
 body {
   padding: 0;
   margin: 0;
-  /* background-image: radial-gradient( circle,#00000056 50%,
+  background-image: radial-gradient( circle,#00000056 50%,
 					#050b2752 95%), 
-						url('https://i.ibb.co/SwXmw7P/XANDEUM-GLOBAL-BG.png'); */
-	/* background-image: url("https://i.ibb.co/SwXmw7P/XANDEUM-GLOBAL-BG.png");  */
+						url('https://i.ibb.co/SwXmw7P/XANDEUM-GLOBAL-BG.png'); 
+	/* background-image: url("https://i.ibb.co/SwXmw7P/XANDEUM-GLOBAL-BG.png"); 
 	background-color: #08113b; 
 	/* height: 160vh;  */
 	background-position: center;
@@ -40,4 +40,10 @@ a {
 
 .border-xnd {
   border-radius: 6px !important;
+}
+
+input[type="number"] {
+  -webkit-appearance: none; /* For Chrome, Safari, Edge */
+  -moz-appearance: textfield; /* For Firefox */
+  appearance: none; /* Standard syntax */
 }
