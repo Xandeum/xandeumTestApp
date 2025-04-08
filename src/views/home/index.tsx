@@ -59,6 +59,8 @@ export const HomeView: FC = ({ }) => {
       setSolBalance(balance / LAMPORTS_PER_SOL);
       setIsAirdropProcessing(false);
       notify({ type: 'success', message: 'Airdrop successful!', description: `1 SOL has been airdropped to your wallet` });
+      window?.location?.reload();
+      return;
     } catch (error) {
       console.log("error while airdrop : ", error)
       setIsAirdropProcessing(false);
