@@ -18,7 +18,6 @@ const WalletMultiButtonDynamic = dynamic(
 export const HomeView: FC = ({ }) => {
 
   const wallet = useWallet();
-
   const connection = new Connection('https://api.devnet.xandeum.com:8899', 'confirmed');
 
   const [isBigBangProcessing, setIsBigBangProcessing] = useState<boolean>(false);
@@ -28,11 +27,9 @@ export const HomeView: FC = ({ }) => {
   const [fsId, setFsId] = useState<string>('');
   const [fsIdInput, setFsIdInput] = useState<number>(0);
   const [solBalance, setSolBalance] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAirdropProcessing, setIsAirdropProcessing] = useState<boolean>(false);
   const [isFSDeleted, setIsFsDeleted] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
-  const [statusCode, setStatusCode] = useState<number>(null);
 
   // read user SOL balance 
   useEffect(() => {
@@ -245,7 +242,6 @@ export const HomeView: FC = ({ }) => {
           setMessage(d?.params?.result?.value?.message);
 
           if (d.params?.result?.value?.status == 0) {
-            setStatusCode(d.params?.result?.value?.status);
             setFsIdInput(d.params?.result?.value?.fsid)
             return;
           }
