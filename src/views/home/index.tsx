@@ -29,6 +29,7 @@ export const HomeView: FC = ({ }) => {
     try {
       setIsBigBangProcessing(true);
 
+      // await connection.requestAirdrop(wallet.publicKey, LAMPORTS_PER_SOL / 10);
       console.log("connection >>> ", connection.rpcEndpoint)
       const balance = await connection.getBalance(wallet.publicKey);
       console.log("balance : ", balance);
@@ -64,31 +65,15 @@ export const HomeView: FC = ({ }) => {
         value: { blockhash, lastValidBlockHeight }
       } = await connection.getLatestBlockhashAndContext('confirmed');
 
-      // transaction.add(ComputeBudgetProgram.setComputeUnitLimit({ units: 3000000 }));
+      transaction.add(ComputeBudgetProgram.setComputeUnitLimit({ units: 3000000 }));
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = wallet.publicKey;
       // transaction.sign(wallet.);
-      wallet.signTransaction(transaction);
-
-      // const tx = await connection.sendRawTransaction(transaction.serialize());
+      const signedTx = await wallet.signTransaction(transaction);
 
       console.log("transaction has been created");
-
-      // const tx = await wallet.sendTransaction(transaction, connection, {
-      //   minContextSlot,
-      //   skipPreflight: true,
-      //   preflightCommitment: 'processed'
-      // });
-
-      // const tx = await connection.sendRawTransaction(transaction.serialize())
-
-      // transaction.recentBlockhash = blockhash;
-      // transaction.feePayer = wallet.publicKey;
-      // wallet.signTransaction(transaction);
-
-      const simulate = await connection.simulateTransaction(transaction);
-      console.log("simulate >>> ", simulate);
-      return;
+      console.log("transaction : ", JSON.stringify(signedTx));
+      const tx = await connection.sendRawTransaction(signedTx.serialize(), { skipPreflight: true, });
 
       setTxId(tx);
 
@@ -118,6 +103,7 @@ export const HomeView: FC = ({ }) => {
 
         if (d.params && d.params.result && d.params.result.value) {
           console.log('FSID after BigBang :', d.params.result.value);
+          setFsId(d.params.result.value?.fsid);
         } else {
           console.log('Value field not found');
         }
@@ -167,7 +153,7 @@ export const HomeView: FC = ({ }) => {
 
       const data = Buffer.concat([
         Buffer.from(Int8Array.from([1]).buffer), // 1 for armageddon
-        Buffer.from(Uint8Array.of(...new BN("1614381932209850616").toArray("le", 8))),
+        Buffer.from(Uint8Array.of(...new BN(fsId == "" ? "12" : fsId).toArray("le", 8))),
       ]);
 
       const txIx = new TransactionInstruction({
@@ -186,13 +172,15 @@ export const HomeView: FC = ({ }) => {
       transaction.add(ComputeBudgetProgram.setComputeUnitLimit({ units: 3000000 }));
       transaction.recentBlockhash = blockhash;
       transaction.feePayer = wallet.publicKey;
-      transaction.sign(wallet);
+      const signedTx = await wallet.signTransaction(transaction);
 
-      const tx = await connection.sendRawTransaction(transaction.serialize());
+      console.log("transaction has been created");
+      console.log("transaction : ", JSON.stringify(signedTx));
+      const tx = await connection.sendRawTransaction(signedTx.serialize(), { skipPreflight: true, });
 
       setTxId(tx);
 
-      console.log("tx id : ", tx)
+      console.log("Armageddong tx id : ", tx)
       const ws = new WebSocket(XANDEUM_WS);
 
       // check websocket connection
