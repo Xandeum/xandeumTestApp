@@ -4,7 +4,7 @@ import React, { FC, useState } from 'react';
 import Loader from 'components/Loader';
 import { PROGRAM, XANDEUM_WS } from 'CONSTS';
 import { notify } from 'utils/notifications';
-import { ComputeBudgetProgram, Connection, Keypair, LAMPORTS_PER_SOL, Transaction, TransactionInstruction } from '@solana/web3.js';
+import { ComputeBudgetProgram, Transaction, TransactionInstruction } from '@solana/web3.js';
 
 import { walletKeypair } from 'helpers/keypair';
 import { BN } from '@project-serum/anchor';
