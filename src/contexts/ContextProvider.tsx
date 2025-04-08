@@ -24,13 +24,13 @@ const WalletContextProvider: FC<{ children: ReactNode }> = ({ children }) => {
 
     if (network === WalletAdapterNetwork.Devnet) {
         // endpoint = "https://devnet.helius-rpc.com/?api-key=2aca1e9b-9f51-44a0-938b-89dc6c23e9b4";
-        endpoint = "http://api.trynet.xandeum.com:8899";
+        endpoint = "https://api.devnet.xandeum.com:8899";
     }
     if (network === WalletAdapterNetwork.Mainnet) {
         // endpoint = "https://red-yolo-mountain.solana-mainnet.quiknode.pro/174b836a161a7cafc760c335f3930638cf9f19ec/";
         // endpoint = "https://rpc.helius.xyz/?api-key=2aca1e9b-9f51-44a0-938b-89dc6c23e9b4";
         // endpoint = "http://8.52.151.4:8899";
-        endpoint = "http://api.trynet.xandeum.com:8899";
+        endpoint = "https://api.devnet.xandeum.com:8899";
     }
 
     const wallets = useMemo(

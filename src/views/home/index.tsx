@@ -19,7 +19,7 @@ export const HomeView: FC = ({ }) => {
 
   const wallet = useWallet();
 
-  const connection = new Connection('http://api.trynet.xandeum.com:8899', 'confirmed');
+  const connection = new Connection('https://api.devnet.xandeum.com:8899', 'confirmed');
 
   const [isBigBangProcessing, setIsBigBangProcessing] = useState<boolean>(false);
   const [isArmageddonProcessing, setIsArmageddonProcessing] = useState<boolean>(false);
@@ -59,6 +59,8 @@ export const HomeView: FC = ({ }) => {
       setSolBalance(balance / LAMPORTS_PER_SOL);
       setIsAirdropProcessing(false);
       notify({ type: 'success', message: 'Airdrop successful!', description: `1 SOL has been airdropped to your wallet` });
+      window?.location?.reload();
+      return;
     } catch (error) {
       console.log("error while airdrop : ", error)
       setIsAirdropProcessing(false);
@@ -273,7 +275,7 @@ export const HomeView: FC = ({ }) => {
 
   return (
     <div className="container flex mx-auto flex-col items-center w-full max-w-4xl p-4 mb-10">
-      <h2 className="text-3xl font-medium text-white md:leading-tight  my-5">Xandeum Test App - TryNet</h2>
+      <h2 className="text-3xl font-medium text-white md:leading-tight  my-5">Xandeum Test App - DevNet</h2>
 
       <div className='flex flex-col gap-4 bg-tiles border-xnd w-full text-white p-10  mt-8 relative md:mb-0 mb-28 text-base'>
         <div className="absolute -inset-2 -z-10 bg-gradient-to-r from-[#fda31b] via-[#622657] to-[#198476] border-xnd blur  "></div>
