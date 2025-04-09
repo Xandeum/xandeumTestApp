@@ -19,6 +19,7 @@ export const HomeView: FC = ({ }) => {
 
   const wallet = useWallet();
   const connection = new Connection('https://api.devnet.xandeum.com:8899', 'confirmed');
+  // const connection = new Connection('http://23.83.67.172:8899', 'confirmed');
 
   const [isBigBangProcessing, setIsBigBangProcessing] = useState<boolean>(false);
   const [isArmageddonProcessing, setIsArmageddonProcessing] = useState<boolean>(false);
@@ -26,7 +27,7 @@ export const HomeView: FC = ({ }) => {
   const [txId, setTxId] = useState<string>('');
   const [fsId, setFsId] = useState<string>('');
   const [fsIdInput, setFsIdInput] = useState<number>(0);
-  const [solBalance, setSolBalance] = useState<number>(0);
+  const [solBalance, setSolBalance] = useState<number>(0)
   const [isAirdropProcessing, setIsAirdropProcessing] = useState<boolean>(false);
   const [isFSDeleted, setIsFsDeleted] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
@@ -132,6 +133,8 @@ export const HomeView: FC = ({ }) => {
         const d = JSON.parse(
           String(event.data).replace(/:\s*(\d{16,})/g, ': "$1"')
         );
+
+        console.log("response : ", d);
 
         if (d.params && d.params.result && d.params.result.value && d.params.result.value.fsid) {
           console.log('FSID after BigBang :', d.params.result.value);
