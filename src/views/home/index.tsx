@@ -243,9 +243,9 @@ export const HomeView: FC = ({ }) => {
 
           if (d.params?.result?.value?.status == 0) {
             setFsIdInput(d.params?.result?.value?.fsid)
-            return;
+            // return;
           }
-          return
+          // return
         } else {
           console.log('Value field not found');
         }
