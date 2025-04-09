@@ -10,6 +10,7 @@ import { BN } from '@project-serum/anchor';
 import { useWallet } from '@solana/wallet-adapter-react';
 import dynamic from 'next/dynamic';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import Link from 'next/link';
 
 const WalletMultiButtonDynamic = dynamic(
   async () => (await import('@solana/wallet-adapter-react-ui')).WalletMultiButton,
@@ -32,7 +33,14 @@ export const HomeView: FC = ({ }) => {
   const [isAirdropProcessing, setIsAirdropProcessing] = useState<boolean>(false);
   const [isFSDeleted, setIsFsDeleted] = useState<boolean>(false);
   const [message, setMessage] = useState<string>('');
-  const [statusCode, setStatusCode] = useState<number>(null);
+  const [statusCode, setStatusCode] = useState({
+    bigbang: null,
+    armageddon: null
+  });
+
+  useEffect(() => {
+    console.log("status code >>> ", statusCode);
+  }, [statusCode])
 
   // read user SOL balance 
   useEffect(() => {
@@ -73,6 +81,7 @@ export const HomeView: FC = ({ }) => {
   const onBigBang = async () => {
     try {
       setIsFsDeleted(false);
+      setFsId('');
       setIsBigBangProcessing(true);
 
       if (!wallet?.publicKey) {
@@ -139,6 +148,7 @@ export const HomeView: FC = ({ }) => {
         if (d.params && d.params.result && d.params.result.value && d.params.result.value.fsid) {
           console.log('FSID after BigBang :', d.params.result.value);
           if (!fsId) {
+            setStatusCode({ ...statusCode, bigbang: d.params?.result?.value?.status });
             setFsId(d.params.result.value?.fsid);
           }
         } else {
@@ -172,6 +182,7 @@ export const HomeView: FC = ({ }) => {
   const onArmageddon = async () => {
     try {
       setIsArmageddonProcessing(true);
+      setStatusCode({ ...statusCode, armageddon: null });
 
       if (!wallet?.publicKey) {
         notify({ type: 'error', message: 'Error!', description: `Please connect your wallet first` });
@@ -245,7 +256,7 @@ export const HomeView: FC = ({ }) => {
           setMessage(d?.params?.result?.value?.message);
 
           if (d.params?.result?.value?.status == 0) {
-            setStatusCode(d.params?.result?.value?.status);
+            setStatusCode({ ...statusCode, armageddon: d.params?.result?.value?.status });
             setFsIdInput(d.params?.result?.value?.fsid)
             return;
           }
@@ -361,12 +372,15 @@ export const HomeView: FC = ({ }) => {
 
                     <div className='flex flex-row items-center justify-center relative mt-8'>
                       {fsId ?
-                        <div className="font-normal text-right">File System Created Successfully. FSID: {fsId}</div>
+                        <div className="font-normal text-center">
+                          File System Created Successfully. FSID: {fsId}
+                          <div className="font-normal text-center">Check it's there on <Link href={'https://showatlas.xandeum.network'} className='underline font-bold'>showatlas</Link></div>
+                        </div>
                         :
                         isBigBangProcessing ?
                           <div className='flex flex-row items-center justify-center relative'>
                             <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-[#FDA31B] mr-2'></div>
-                            <div className="font-normal text-right">Waiting for FSID creation</div>
+                            <div className="font-normal text-center">Waiting for FSID creation</div>
                           </div>
                           :
                           null
@@ -413,7 +427,15 @@ export const HomeView: FC = ({ }) => {
                       <div className='flex flex-row items-center justify-center relative mt-8'>
                         {
                           isFSDeleted ?
-                            <div className="font-normal text-right">{message}</div>
+                            <div className="font-normal text-center">
+                              {message}
+                              {
+                                statusCode?.armageddon == 0 ?
+                                  <div className="font-normal text-center">Check it's there on <Link href={'https://showatlas.xandeum.network'} className='underline font-bold'>showatlas</Link></div>
+                                  :
+                                  null
+                              }
+                            </div>
                             :
                             isArmageddonProcessing ?
                               <div className='flex flex-row items-center justify-center relative'>
