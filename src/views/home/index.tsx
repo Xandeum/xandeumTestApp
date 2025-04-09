@@ -135,7 +135,7 @@ export const HomeView: FC = ({ }) => {
 
         if (d.params && d.params.result && d.params.result.value && d.params.result.value.fsid) {
           console.log('FSID after BigBang :', d.params.result.value);
-          if (!fsId) {
+          if(d.params?.result?.value?.status == 0) {
             setFsId(d.params.result.value?.fsid);
           }
         } else {
