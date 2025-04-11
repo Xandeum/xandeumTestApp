@@ -284,18 +284,18 @@ export const HomeView: FC = ({ }) => {
       < div className='flex flex-col gap-4 bg-tiles border-xnd w-full text-white p-3  mt-8 relative md:mb-0 mb-28 text-base' >
         <div className="absolute -inset-2 -z-10 bg-gradient-to-r from-[#fda31b] via-[#622657] to-[#198476] border-xnd blur  " > </div>
         < p className="font-medium text-white md:leading-tight text-justify  my-2" >
-          This is a demo of the Xandeum Freiburg release.It showcases that xandeum - agave, our modified validator client, can intercept Xandeum Transactions that are wrapped into normal Solana transaction, decode them, send them through secure, high - perfomance and redundant communication channels through intermediate infrastructure and process them on a system named Atlas.
+          This is a demo of the Xandeum Freiburg release. It showcases that Xandeum Agave, our modified validator client, can intercept Xandeum Transactions that are wrapped into normal Solana transaction, decode them, send them through secure, high perfomance and redundant communication channels through intermediate infrastructure and process them on a system named Atlas.
         </p>
 
         < p className="font-medium text-white md:leading-tight text-justify  my-2" >
-          Missing the actual storage of data ? Freiburg is all the technical foundation - and data will be chunked into pages and sent to and stored on pNodes in the upcoming Munich release.
+          Missing the actual storage of data? Freiburg is all the technical foundation - and data will be chunked into pages and sent to and stored on pNodes in the upcoming Munich release.
         </p>
         < p className="font-medium text-white md:leading-tight text-justify  my-2" >
-          Now have fun playing God - run your own & apos; bigBang & apos;s to create a universe, a.k.a.file system, and destroy some universes via & apos; armageddon & apos;.
+          Now have fun playing God - run your own &apos;bigBang&apos; to create a universe, a.k.a.file system, and destroy some universes via &apos;armageddon&apos;.
         </p>
 
         < p className="font-medium text-white md:leading-tight text-justify  my-2" >
-          It looks simple and effortless - but it encompasses all the hard work of digging deep into the Solana inner workings and modify them for our purposes, creating that solid foundation for what & apos; s to come.
+          It looks simple and effortless - but it encompasses all the hard work of digging deep into the Solana inner workings and modify them for our purposes, creating that solid foundation for what&apos;s to come.
         </p>
 
         < p className="font-medium text-white md:leading-tight text-justify  my-2" >
@@ -442,6 +442,10 @@ export const HomeView: FC = ({ }) => {
                               null
                         }
                       </div>
+                    </div>
+
+                    <div>
+                      Be sure to set your wallet RPC to &apos;<span className='text-[#FDA31B]' >https://api.devnet.xandeum.com:8899</span>&apos;
                     </div>
                   </>
               }
