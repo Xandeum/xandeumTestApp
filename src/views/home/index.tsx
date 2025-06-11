@@ -20,7 +20,7 @@ export const HomeView: FC = ({ }) => {
 
   const wallet = useWallet();
 
-  const connection = new Connection('http://api.trynet.xandeum.com:8899', 'confirmed');
+  const connection = new Connection('https://apis.trynet.xandeum.com', 'confirmed');
 
   const [isBigBangProcessing, setIsBigBangProcessing] = useState<boolean>(false);
   const [isArmageddonProcessing, setIsArmageddonProcessing] = useState<boolean>(false);
