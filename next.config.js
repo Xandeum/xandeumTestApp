@@ -13,7 +13,13 @@ const nextConfig = {
     return config;
   },
   images: {
-    domains: ['i.ibb.co', 'static.wixstatic.com', 'raw.githubusercontent.com'],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'i.ibb.co',
+        pathname: '**',
+      },
+    ],
   },
 }
 
